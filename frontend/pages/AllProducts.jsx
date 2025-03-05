@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Banner from "../components/Banner";
-import Card from "../components/card";
+import Card from "../components/Card";
 import { axiosInstance } from "../lib/axios";
 import { useAuth } from "../context/AuthContext";
 
