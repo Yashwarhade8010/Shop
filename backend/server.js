@@ -6,7 +6,7 @@ const cors = require('cors')
 const productRoutes = require("./routes/productRoutes")
 
 const app = express()
-app.use(cors({origin:'https://shop-ten-alpha.vercel.app/'}))
+app.use(cors({origin:'https://shop-ten-alpha.vercel.app'}))
 mongoConnection()
 app.use(express.json())
 app.use("/user",userRoutes)
