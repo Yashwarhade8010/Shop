@@ -1,0 +1,15 @@
+const express = require('express')
+require('dotenv').config()
+const mongoConnection = require("./config/mongoDB")
+const userRoutes = require("./routes/userRoutes")
+const cors = require('cors')
+const productRoutes = require("./routes/productRoutes")
+
+const app = express()
+app.use(cors({origin:'http://localhost:5173'}))
+mongoConnection()
+app.use(express.json())
+app.use("/user",userRoutes)
+app.use("/product",productRoutes)
+
+app.listen(process.env.PORT,console.log("Server stated at port:"+process.env.PORT))
