@@ -3,118 +3,120 @@ import Banner from "../components/Banner";
 import Card from "../components/Card";
 import { axiosInstance } from "../lib/axios";
 import { useAuth } from "../context/AuthContext";
+import Skeleton from "../components/Skeleton";
 
 const AllProducts = () => {
-  const categories = [
-    "All",
-    "Electronic",
-    "Furniture",
-    "Fashion",
-    "Jewellery",
-  ];
+  const categories = ["All", "Electronic", "Furniture", "Fashion", "Jewellery"];
   const sortMenu = [
     "Newest Arrivals",
     "Price: Low to High",
     "Price: High to Low",
   ];
-  
-  const [active, setActive] = useState(categories[0]); 
+
+  const [active, setActive] = useState(categories[0]);
   const [sort, setSort] = useState(sortMenu[0]);
   const [page, setPage] = useState(1);
-  const [priceRange,setPriceRange] = useState(1000)
-  const [filter,setFilter] = useState(false)
-  
-  const [filteredProducts,setFilteredProducts] = useState([])
+  const [priceRange, setPriceRange] = useState(1000);
+  const [filter, setFilter] = useState(false);
+
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [search, setSearch] = useState("");
   const { products, setProducts } = useAuth();
+  const [loading, setLoading] = useState(false);
 
-  const productsPerPage = 6
-  const lastProductIndex = page*productsPerPage
-  const firstProductIndex = lastProductIndex-productsPerPage
-  let productsToRender = products.slice(firstProductIndex,lastProductIndex)
-  if(filter || priceRange > 1000){
-    productsToRender = filteredProducts.slice(firstProductIndex,lastProductIndex)
+  const productsPerPage = 6;
+  const lastProductIndex = page * productsPerPage;
+  const firstProductIndex = lastProductIndex - productsPerPage;
+  let productsToRender = products.slice(firstProductIndex, lastProductIndex);
+  if (filter || priceRange > 1000) {
+    productsToRender = filteredProducts.slice(
+      firstProductIndex,
+      lastProductIndex
+    );
   }
-  
 
   useEffect(() => {
+    setLoading(true);
     async function loadProduct() {
       try {
         const result = await axiosInstance.get("/product");
         setProducts(result.data);
+        setLoading(false);
+        loadProduct();
       } catch (err) {
         console.log(err);
+        loadProduct();
+        setLoading(false);
       }
     }
-    loadProduct();
-    
-
   }, []);
 
   const clrFilter = () => {
     setPriceRange(1000);
     setActive(categories[0]);
-    setFilteredProducts([])
-    setFilter(false)
-    setPage(1)
+    setFilteredProducts([]);
+    setFilter(false);
+    setPage(1);
   };
 
-  const handleNext = ()=>{
+  const handleNext = () => {
     let pages = products.length / productsPerPage;
-    if(filter) pages = filteredProducts.length/productsPerPage
-    if(page<pages){
-      setPage(page+1)
+    if (filter) pages = filteredProducts.length / productsPerPage;
+    if (page < pages) {
+      setPage(page + 1);
     }
-  }
+  };
 
-  const handlePrev = ()=>{
-    if(page>1){
-      setPage(page-1)
+  const handlePrev = () => {
+    if (page > 1) {
+      setPage(page - 1);
     }
-  }
+  };
 
-  const handleSort = (productsToSort)=>{
-    let sortedProducts = [...productsToSort]
+  const handleSort = (productsToSort) => {
+    let sortedProducts = [...productsToSort];
 
-    if(sort == "Price: Low to High"){
-      sortedProducts.sort((a,b)=>a.price-b.price)
-    }else if(sort == "Price: High to Low"){
-      sortedProducts.sort((a,b)=>b.price-a.price)
-    }else if(sort == "Newest Arrivals"){
-      sortedProducts.sort((a,b)=>new Date(b.createdAt) - new Date(a.createdAt))
+    if (sort == "Price: Low to High") {
+      sortedProducts.sort((a, b) => a.price - b.price);
+    } else if (sort == "Price: High to Low") {
+      sortedProducts.sort((a, b) => b.price - a.price);
+    } else if (sort == "Newest Arrivals") {
+      sortedProducts.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
     }
 
-    return sortedProducts
-  }
+    return sortedProducts;
+  };
   useEffect(() => {
     let filtered = products;
-  
+
     // Category Filtering
     if (active.toLowerCase() !== "all") {
       filtered = filtered.filter((product) => product.category === active);
       setFilter(true);
     }
-  
+
     // Price Filtering
     if (priceRange < 1000000) {
       filtered = filtered.filter((product) => product.price < priceRange);
-      
     }
 
-    filtered = handleSort(filtered)
-  
+    filtered = handleSort(filtered);
+
     setFilteredProducts(filtered);
     setPage(1);
-  }, [active, priceRange, products,sort]);
+  }, [active, priceRange, products, sort]);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axiosInstance.get(`/product/getproduct?search=${search}`)
-        
+        const response = await axiosInstance.get(
+          `/product/getproduct?search=${search}`
+        );
+
         setFilteredProducts(response.data);
         setPage(1);
-        
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
@@ -134,15 +136,14 @@ const AllProducts = () => {
           <div className="flex flex-col gap-y-3 items-start w-full">
             {categories.map((category) => (
               <button
-              
                 key={category}
                 className={`w-full text-left px-2 py-1 rounded transition-all ${
                   active === category
                     ? "border-l-4 border-success font-semibold "
                     : "border-l-4 border-transparent"
                 }`}
-                onClick={()=>{
-                  setActive(category)
+                onClick={() => {
+                  setActive(category);
                 }}
               >
                 {category}
@@ -159,7 +160,7 @@ const AllProducts = () => {
               min={1000}
               max={1000000}
               value={priceRange}
-              onChange={(e)=>setPriceRange(e.target.value)}
+              onChange={(e) => setPriceRange(e.target.value)}
               className="range range-success w-full"
             />
           </div>
@@ -182,8 +183,12 @@ const AllProducts = () => {
                 <i className="fa-solid fa-grip-lines"></i>
               </button>
               <h1>
-                <span className="font-bold">{filter || filteredProducts.length > 0 ? (filteredProducts.length):(products.length)}</span>-products
-                found
+                <span className="font-bold">
+                  {filter || filteredProducts.length > 0
+                    ? filteredProducts.length
+                    : products.length}
+                </span>
+                -products found
               </h1>
             </div>
             {/* Search Bar */}
@@ -220,19 +225,25 @@ const AllProducts = () => {
             </div>
           </header>
           <div className="m-3 grid grid-cols-2 gap-6">
-            {productsToRender.map((product) => {
-              return <Card key={product._id} product={product} />;
-            })}
+            {loading ? (
+              <Skeleton />
+            ) : (
+              productsToRender.map((product) => {
+                return <Card key={product._id} product={product} />;
+              })
+            )}
           </div>
           <div className="join flex justify-center mt-5">
-          <button onClick={handlePrev} className="join-item btn">«</button>
-          <button className="join-item btn">Page {page}</button>
-          <button onClick={handleNext} className="join-item btn">»</button>
-        </div>
+            <button onClick={handlePrev} className="join-item btn">
+              «
+            </button>
+            <button className="join-item btn">Page {page}</button>
+            <button onClick={handleNext} className="join-item btn">
+              »
+            </button>
+          </div>
         </article>
-       
       </div>
-     
     </>
   );
 };
