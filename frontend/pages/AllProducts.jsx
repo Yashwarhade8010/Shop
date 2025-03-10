@@ -36,19 +36,18 @@ const AllProducts = () => {
   }
 
   useEffect(() => {
-    setLoading(true);
     async function loadProduct() {
       try {
+        setLoading(true);
         const result = await axiosInstance.get("/product");
         setProducts(result.data);
         setLoading(false);
-        loadProduct();
       } catch (err) {
         console.log(err);
-        loadProduct();
         setLoading(false);
       }
     }
+    loadProduct();
   }, []);
 
   const clrFilter = () => {
