@@ -40,8 +40,8 @@ const AllProducts = () => {
       try {
         setLoading(true);
         const result = await axiosInstance.get("/product");
-        setProducts(result.data);
         setLoading(false);
+        setProducts(result.data);
       } catch (err) {
         console.log(err);
         setLoading(false);
@@ -223,7 +223,7 @@ const AllProducts = () => {
               </details>
             </div>
           </header>
-          <div className="m-3 grid grid-cols-2 gap-6">
+          <div className="m-1 grid grid-cols-2 gap-6">
             {loading ? (
               <Skeleton />
             ) : (

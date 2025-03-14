@@ -1,13 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+
 const Card = ({ product }) => {
-  const { setAtcProducts,setCartTotal,} = useAuth();
-  
+  const { setAtcProducts, setCartTotal } = useAuth();
+
   const AddProduct = () => {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const cartTotalPrice = JSON.parse(localStorage.getItem("cartTotal"))
-    const existingProduct = cart.find((item) => item._id == product._id);
+    const cartTotalPrice = JSON.parse(localStorage.getItem("cartTotal")) || 0;
+    const existingProduct = cart.find((item) => item._id === product._id);
 
     if (!existingProduct) {
       cart.push(product);
@@ -17,49 +18,36 @@ const Card = ({ product }) => {
       setCartTotal(newTotal);
       localStorage.setItem("cartTotal", JSON.stringify(newTotal));
 
-      toast(
-        <div role="alert" className="alert alert-success ">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 shrink-0 stroke-current"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>{product.name} added to cart</span>
-        </div>,
-        {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          theme: "light",
-        }
-      );
+      toast.success(`${product.name} added to cart`, {
+        position: "top-right",
+      });
     } else {
       toast("Product already in cart");
     }
   };
 
   return (
-    <div className="card bg-base-100 w-70 shadow-xl ">
-      <figure className="px-10 pt-10">
-        <img src={product.thumbnail} alt="Shoes" className="rounded-xl" />
+    <div className="card bg-base-100 shadow-xl w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto">
+      <figure className="px-5 pt-5">
+        <img
+          src={product.thumbnail}
+          alt={product.name}
+          className="rounded-xl w-full h-auto"
+        />
       </figure>
       <div className="card-body items-center text-center">
-        <h2 className="card-title text-emerald-600">{product.name}</h2>
-        <p>{product.description}</p>
-        <h3 className="card-title">₹{product.price.toLocaleString()}</h3>
-        <div className="card-actions justify-center">
-          <button onClick={AddProduct} className="btn btn-primary">
+        <h2 className="card-title text-emerald-600 text-lg sm:text-xl">
+          {product.name}
+        </h2>
+        <p className="text-sm sm:text-base">{product.description}</p>
+        <h3 className="card-title text-lg sm:text-xl">
+          ₹{product.price.toLocaleString()}
+        </h3>
+        <div className="card-actions w-full flex justify-center mt-2">
+          <button
+            onClick={AddProduct}
+            className="btn btn-primary w-full sm:w-auto"
+          >
             Add to cart
           </button>
         </div>
